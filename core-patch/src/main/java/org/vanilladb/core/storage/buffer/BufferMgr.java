@@ -109,7 +109,7 @@ public class BufferMgr implements TransactionLifecycleListener {
 	 * @return the buffer pinned to that block
 	 */
 	public Buffer pin(BlockId blk) {
-		boolean opt = true;
+		boolean opt = false;
 
 		if(opt){
 			// Check if already pinned by this transaction
@@ -232,7 +232,7 @@ public class BufferMgr implements TransactionLifecycleListener {
 	 * @return the buffer pinned to that block
 	 */
 	public Buffer pinNew(String fileName, PageFormatter fmtr) {
-		boolean opt = true;
+		boolean opt = false;
 
 		if(opt){
 			if (pinningBuffers.size() == BUFFER_POOL_SIZE)
@@ -332,7 +332,7 @@ public class BufferMgr implements TransactionLifecycleListener {
 	 * @param buff the buffer to be unpinned
 	 */
 	public void unpin(Buffer buff) {
-		boolean opt = true;
+		boolean opt = false;
 
 		if(opt){ 
 			BlockId blk = buff.block();
@@ -400,7 +400,7 @@ public class BufferMgr implements TransactionLifecycleListener {
 	}
 
 	private void unpinAll(Transaction tx) {
-		boolean opt = true;
+		boolean opt = false;
 
 		if(opt){ 
 			// Copy the set of pinned buffers to avoid ConcurrentModificationException
@@ -433,7 +433,7 @@ public class BufferMgr implements TransactionLifecycleListener {
 	 * them.
 	 */
 	private void repin() {
-		boolean opt = true;
+		boolean opt = false;
 
 		if(opt){ 
 			if (logger.isLoggable(Level.WARNING))
