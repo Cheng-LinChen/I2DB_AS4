@@ -14,7 +14,6 @@
  * limitations under the License.
  *******************************************************************************/
 package org.vanilladb.core.storage.file;
-
 import java.nio.BufferOverflowException;
 
 import org.vanilladb.core.server.VanillaDb;
@@ -147,29 +146,29 @@ public class Page {
 	 * 
 	 * @return the constant value at that offset
 	 */
-	// public Constant getVal(int offset, Type type) {
-	// 	int size;
-	// 	byte[] byteVal = null;
+	public Constant getVal(int offset, Type type) {
+		int size;
+		byte[] byteVal = null;
 
-	// 	// Check the length of bytes
-	// 	if (type.isFixedSize()) {
-	// 		size = type.maxSize();
-	// 	} else {
-	// 		byteVal = new byte[ByteHelper.INT_SIZE];
-	// 		synchronized (contents) {
-	// 			contents.get(offset, byteVal);
-	// 		}
-	// 		size = ByteHelper.toInteger(byteVal);
-	// 		offset += ByteHelper.INT_SIZE;
-	// 	}
+		// Check the length of bytes
+		if (type.isFixedSize()) {
+			size = type.maxSize();
+		} else {
+			byteVal = new byte[ByteHelper.INT_SIZE];
+			synchronized (contents) {
+				contents.get(offset, byteVal);
+			}
+			size = ByteHelper.toInteger(byteVal);
+			offset += ByteHelper.INT_SIZE;
+		}
 
-	// 	// Get bytes and translate it to Constant
-	// 	byteVal = new byte[size];
-	// 	synchronized (contents) {
-	// 		contents.get(offset, byteVal);
-	// 	}
-	// 	return Constant.newInstance(type, byteVal);
-	// }
+		// Get bytes and translate it to Constant
+		byteVal = new byte[size];
+		synchronized (contents) {
+			contents.get(offset, byteVal);
+		}
+		return Constant.newInstance(type, byteVal);
+	}
 
 
 	/**
@@ -181,30 +180,32 @@ public class Page {
 	 * @param val
 	 *            the constant value to be written to the page
 	 */
-	// public void setVal(int offset, Constant val) {
-	// 	byte[] byteval = val.asBytes();
+	public void setVal(int offset, Constant val) {
+		byte[] byteval = val.asBytes();
 
-	// 	// Append the size of value if it is not fixed size
-	// 	if (!val.getType().isFixedSize()) {
-	// 		// check the field capacity and value size
-	// 		if (offset + ByteHelper.INT_SIZE + byteval.length > BLOCK_SIZE)
-	// 			throw new BufferOverflowException();
+		// Append the size of value if it is not fixed size
+		if (!val.getType().isFixedSize()) {
+			// check the field capacity and value size
+			if (offset + ByteHelper.INT_SIZE + byteval.length > BLOCK_SIZE)
+				throw new BufferOverflowException();
 
-	// 		byte[] sizeBytes = ByteHelper.toBytes(byteval.length);
-	// 		synchronized (contents) {
-	// 			contents.put(offset, sizeBytes);
-	// 			offset += sizeBytes.length;
-	// 			contents.put(offset, byteval);
-	// 			return;
-	// 		}
-	// 	}
-	// 	else{
-	// 		// Put bytes
-	// 		synchronized (contents) {
-	// 			contents.put(offset, byteval);
-	// 		}
-	// 	}
-	// }
+			byte[] sizeBytes = ByteHelper.toBytes(byteval.length);
+			synchronized (contents) {
+				contents.put(offset, sizeBytes);
+			}
+				offset += sizeBytes.length;
+			synchronized (contents) {
+				contents.put(offset, byteval);
+			}
+				return;
+		}
+		else{
+			// Put bytes
+			synchronized (contents) {
+				contents.put(offset, byteval);
+			}
+		}
+	}
 
 	/**
 	 * Close this page to release resources.
@@ -215,47 +216,47 @@ public class Page {
 
 
 
-	public synchronized  Constant getVal(int offset, Type type) {
-		int size;
-		byte[] byteVal = null;
+	// public synchronized  Constant getVal(int offset, Type type) {
+	// 	int size;
+	// 	byte[] byteVal = null;
 
-		// Check the length of bytes
-		if (type.isFixedSize()) {
-			size = type.maxSize();
-		} else {
-			byteVal = new byte[ByteHelper.INT_SIZE];
-			contents.get(offset, byteVal);
-			size = ByteHelper.toInteger(byteVal);
-			offset += ByteHelper.INT_SIZE;
-		}
+	// 	// Check the length of bytes
+	// 	if (type.isFixedSize()) {
+	// 		size = type.maxSize();
+	// 	} else {
+	// 		byteVal = new byte[ByteHelper.INT_SIZE];
+	// 		contents.get(offset, byteVal);
+	// 		size = ByteHelper.toInteger(byteVal);
+	// 		offset += ByteHelper.INT_SIZE;
+	// 	}
 
-		// Get bytes and translate it to Constant
-		byteVal = new byte[size];
-		contents.get(offset, byteVal);
-		return Constant.newInstance(type, byteVal);
-	}
+	// 	// Get bytes and translate it to Constant
+	// 	byteVal = new byte[size];
+	// 	contents.get(offset, byteVal);
+	// 	return Constant.newInstance(type, byteVal);
+	// }
 
 
-	public synchronized void setVal(int offset, Constant val) {
-		byte[] byteval = val.asBytes();
+	// public synchronized void setVal(int offset, Constant val) {
+	// 	byte[] byteval = val.asBytes();
 
-		// Append the size of value if it is not fixed size
-		if (!val.getType().isFixedSize()) {
-			// check the field capacity and value size
-			if (offset + ByteHelper.INT_SIZE + byteval.length > BLOCK_SIZE)
-				throw new BufferOverflowException();
+	// 	// Append the size of value if it is not fixed size
+	// 	if (!val.getType().isFixedSize()) {
+	// 		// check the field capacity and value size
+	// 		if (offset + ByteHelper.INT_SIZE + byteval.length > BLOCK_SIZE)
+	// 			throw new BufferOverflowException();
 
-			byte[] sizeBytes = ByteHelper.toBytes(byteval.length);
-			contents.put(offset, sizeBytes);
-			offset += sizeBytes.length;
-			contents.put(offset, byteval);
-			return;
-		}
-		else{
-			// Put bytes
-			contents.put(offset, byteval);
-		}
-	}
+	// 		byte[] sizeBytes = ByteHelper.toBytes(byteval.length);
+	// 		contents.put(offset, sizeBytes);
+	// 		offset += sizeBytes.length;
+	// 		contents.put(offset, byteval);
+	// 		return;
+	// 	}
+	// 	else{
+	// 		// Put bytes
+	// 		contents.put(offset, byteval);
+	// 	}
+	// }
 
 }
 
